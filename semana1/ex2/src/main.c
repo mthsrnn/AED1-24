@@ -12,7 +12,7 @@ void listaNomes(char *entrada);
 int main(void) {
   int opt;
   char *lista = (char *)calloc(1, sizeof(char));
-  char *entrada, c;
+  char *entrada;
 
   do {
     imprimeMenu();
@@ -21,16 +21,17 @@ int main(void) {
 
     switch (opt) {
     case 1:
-      puts("Insirar o nome para adicionar:");
+      puts("Insira o nome para adicionar:");
       entrada = scanEntrada();
       lista = adicionaNome(entrada, lista);
       free(entrada);
       break;
 
     case 2:
-      puts("Insirar o nome para remover:");
+      puts("Insira o nome para remover:");
       entrada = scanEntrada();
       lista = removeNome(entrada, lista);
+      free(entrada);
       break;
 
     case 3:
@@ -39,25 +40,25 @@ int main(void) {
       break;
 
     case 4:
+
+      free(lista);
       return EXIT_SUCCESS;
       break;
 
     default:
-      puts("Opçao invalida!");
+      puts("Opcao invalida!");
       break;
     }
 
   } while (opt != 4);
-  if(entrada != NULL)
-    free(entrada);
-
-  free(lista);
+  
+  free(lista); //não é pra entrar aqui, mas se entrar, nao dá memory leak
 
   return EXIT_SUCCESS;
 }
 
 void imprimeMenu(void) {
-  puts("Escolha a operação:\n1 - Adiciona nome\n2 - Remove nome\n3 - Lista os nomes\n4 - Sair");
+  puts("Escolha a operacao:\n1 - Adiciona nome\n2 - Remove nome\n3 - Lista os nomes\n4 - Sair");
 }
 
 char *scanEntrada(void) {
@@ -73,7 +74,7 @@ char *scanEntrada(void) {
   while ((c = getchar()) != '\n' && c != EOF) {
     if (i == tamanho) {
       tamanho *= 2;
-      saida = realloc(saida, sizeof(char) * tamanho);
+      saida = realloc(saida, sizeof(char) * (tamanho + 1));
       if (saida == NULL) {
         fputs("Erro de alocacao.", stderr);
         exit(EXIT_FAILURE);
@@ -82,7 +83,7 @@ char *scanEntrada(void) {
     saida[i] = c;
     i++;
   }
-  saida = realloc(saida, sizeof(char) * (i));
+  saida = realloc(saida, sizeof(char) * (i+1));
   if (saida == NULL) {
     fputs("Erro de alocacao.", stderr);
     exit(EXIT_FAILURE);
@@ -97,7 +98,7 @@ char *adicionaNome(char *entrada, char *vetor) {
   char *novoPonteiro = realloc(vetor, sizeof(char) * (tamanhoVetor + tamanhoEntrada + 2)); //o "padding" (+2) extra é pra caber o \0 e a virgula
 
   if (novoPonteiro == NULL) {
-    fputs("Não foi possivel realocar o vetor", stderr);
+    fputs("Nao foi possivel realocar o vetor", stderr);
     exit(EXIT_FAILURE);
   }
 
@@ -105,8 +106,8 @@ char *adicionaNome(char *entrada, char *vetor) {
     novoPonteiro[tamanhoVetor++] = entrada[i];
   }
 
-  novoPonteiro[tamanhoVetor++] = ',';
-
+  novoPonteiro[tamanhoVetor] = ',';
+  tamanhoVetor++;
   novoPonteiro[tamanhoVetor]='\0';
 
   return novoPonteiro;
@@ -127,7 +128,7 @@ char *removeNome(char *entrada, char *vetor) {
         if(vetor[i + j] != entrada[j])
           break;
       }
-      if (j == tamanhoEntrada && (i == 0 && (vetor[j] == ',') || (vetor[i - 1] == ',') && (vetor[i+j]==','))){
+      if (j == tamanhoEntrada && ((i == 0) && (vetor[j] == ',') || (vetor[i - 1] == ',') && (vetor[i+j]==','))){
         tamanhoVetor -= tamanhoEntrada;
         while (i < tamanhoVetor){
           vetor[i] = vetor[i+j+1];
@@ -139,6 +140,6 @@ char *removeNome(char *entrada, char *vetor) {
     }
   }
 
-  puts("string nao encontrada.");
+  puts("Nome nao encontrado.");
   return vetor;
 }
