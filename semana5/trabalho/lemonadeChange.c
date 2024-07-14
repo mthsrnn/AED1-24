@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 /*
  * link da submissão: https://leetcode.com/problems/lemonade-change/submissions/1295953778/
@@ -49,7 +50,7 @@ bool lemonadeChange ( int* bills, int billsSize ) {
 }
 
 int main ( void ) {
-    int bills[5] = { 5, 5, 5, 10, 20 };
+    int bills[5] = { 5, 5, 10, 10, 20 };
 
     lemonadeChange ( bills, 5 ) ? puts ( "True" ) : puts ( "False" );
 
