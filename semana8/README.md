@@ -1,4 +1,4 @@
-# Trabalho Prático 1 (LeetCode 1717)
+# Trabalho Prático 2 (LeetCode 1717)
 
 - Autor: Matheus Renan de Freitas (M5)
 
