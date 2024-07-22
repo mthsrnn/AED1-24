@@ -13,13 +13,16 @@ Desenvolvi a atividade seguindo a seguinte filosofia:
 - Possiveis vazamentos de memória serão tratados individualmente para cada função
 
 Foi utilizado `gdb` para debugar o buffer, através da função de inspeção de memória.
+
 O programa foi desenvolvido na plataforma `GNU/Linux` e compilado via `gcc 13.2.0`
+
 Os testes de `valgrind` foram executados através do comando `valgrind -s --leak-check=full --track-origins=yes  ./agenda` (em algumas ocasiões, foi utilizado através do servidor para o gdb, para debugar funções individualmente, com a adição da flag `--vgdb-error=0`)
 
 # Funcionamento
 
 ## Interpretação do problema
 A agenda começou a ser desenvolvida antes da aula extra de discussão. Como tinha dúvidas a respeito de como interpretar algumas características do enunciado, optei por implementar o programa da forma *mais difícil que consegui pensar*, a fim de evitar descontos na nota.
+
 Eis o plano:
 
 - O banco de dados da agenda **não é a heap**, e vice-versa: uma fila de prioridade é instanciada exclusivamente para realizar as operações principais do programa (busca, exclusão, adição e impressão).
@@ -36,15 +39,22 @@ Eis o plano:
 ## Arquitetura do nodo
 
 Quando um nodo é criado, aloca-se um espaço fixo para os ponteiros `void` triviais da lista duplamente encadeada (`pProximo`, `pAnterior`).
-É alocado também um espaço para a 
+
+É alocado também um espaço para o inteiro que armazena a idade do contato salvo.
+
 Em seguida, soma-se a essas variáveis o tamanho exato da última string lida em `pBuffer`.
+
 A string lida em pBuffer contém um caractere especial de separação para os campos nome e e-mail. Após essa string ser copiada para dentro do nodo, esse caractere é substituido por um separador `'\0'`, pois acessado via operação `(strlen() + 1)` partindo do endereço da última string lida.
+
 Ou seja, os nodos **possuem tamanhos diferentes**, mas **jamais há disperdício da memória alocada**.
 
 ## Arquitetura do banco de dados
 Inserções na lista são feitas sempre no fim, enquanto remoções são feitas sempre do fim. Essa abordagem garante a regra implícita de prioridade para os nodos que estão à mais tempo na lista.
+
 A adição de um novo nodo é feita **copiando-o primeiro para dentro da lista**. A heap é utilizada, portanto, para realizar a inserção do nodo extra em ordem lexicográfica (ou remoção automática, caso haja um nodo com nome idêntico já armazenado).
+
 A remoção é feita retirando todos os nodos do banco de dados e passando-os para a heap auxiliar. O nodo que tiver nome igual ao que se deseja remover não é devolvido à lista, e recebe `free`.
+
 A impressão e a busca também são feitas passando toda a lista para a heap auxilliar, de tal forma que somente a operação intermediária mude:
   - **Na impressão**, todos os nodos são impressos antes de serem adicionados de volta para a lista.
   - **Na busca**, o nodo é impresso somente se o nome que nele consta for igual ao último nome guardado em `pBuffer`.
@@ -52,4 +62,3 @@ A impressão e a busca também são feitas passando toda a lista para a heap aux
 ## Resultados
 
 Não foram encontrados erros de execução ou erros de memória no `valgrind`. Uma demonstração breve desse comportamento é apresentada no vídeo da atividade.
-
